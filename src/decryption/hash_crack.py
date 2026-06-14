@@ -97,45 +97,50 @@ class HashCrack:
         self.found_password = None
         print("\n=== Hash Crack ===")
 
-        cat = self._pick_category()
-        if cat is None:
-            return
+        while True:
+            cat = self._pick_category()
+            if cat is None:
+                return
 
-        ht = self._pick_hash_type(cat)
-        if ht is None:
-            return
+            while True:
+                ht = self._pick_hash_type(cat)
+                if ht is None:
+                    break
 
-        if ht.get('unavailable'):
-            print(f"\n\033[93mNotice: {ht['unavailable']}\033[0m")
-            return
+                if ht.get('unavailable'):
+                    print(f"\n\033[93mNotice: {ht['unavailable']}\033[0m")
+                    continue
 
-        self.hash_type = ht['name']
-        self.verify_func = ht['verify']
-        self.extra = {}
+                self.hash_type = ht['name']
+                self.verify_func = ht['verify']
+                self.extra = {}
 
-        if ht.get('need_salt') and ht.get('salt_prompt'):
-            self.extra['salt'] = input(ht['salt_prompt']).strip()
+                if ht.get('need_salt') and ht.get('salt_prompt'):
+                    self.extra['salt'] = input(ht['salt_prompt']).strip()
 
-        if ht.get('need_key'):
-            self.extra['key'] = input("Enter key: ").strip()
+                if ht.get('need_key'):
+                    self.extra['key'] = input("Enter key: ").strip()
 
-        if ht.get('need_rounds'):
-            r = input("Enter iterations (default 1000): ").strip()
-            self.extra['rounds'] = int(r) if r else 1000
+                if ht.get('need_rounds'):
+                    r = input("Enter iterations (default 1000): ").strip()
+                    self.extra['rounds'] = int(r) if r else 1000
 
-        if ht.get('need_username'):
-            self.extra['username'] = input("Enter username: ").strip()
+                if ht.get('need_username'):
+                    self.extra['username'] = input("Enter username: ").strip()
 
-        self.target = input("Enter hash: ").strip().lower()
+                self.target = input("Enter hash: ").strip().lower()
 
-        payloads = self.payload_loader.find_payloads()
-        if not payloads:
-            print("No payload found.")
-            return
+                payloads = self.payload_loader.find_payloads()
+                if not payloads:
+                    print("No payload found.")
+                    continue
 
-        self._select_payload(payloads)
-        self._execute_cracking()
-        self._display_result()
+                self._select_payload(payloads)
+                if self.selected_payload is None:
+                    continue
+                self._execute_cracking()
+                self._display_result()
+                return
 
     def _pick_category(self):
         cats = [
@@ -147,7 +152,7 @@ class HashCrack:
             "Enterprise / Web (Django, PHPS, tacacs)",
             "Other (plaintext, AIX SSHA512, etc.)",
         ]
-        menu = Menu(cats)
+        menu = Menu(cats, back=True)
         choice = menu.run()
         print()
         return choice
@@ -158,9 +163,11 @@ class HashCrack:
             return None
         group = groups[category]
         items = [h['name'] for h in group]
-        menu = Menu(items)
+        menu = Menu(items, back=True)
         choice = menu.run()
         print()
+        if choice is None:
+            return None
         return group[choice]
 
     def _build_groups(self):
@@ -284,9 +291,12 @@ class HashCrack:
             except Exception:
                 return 0
         items = [f"{os.path.basename(p)}  ({count_lines(p):,})" for p in payloads]
-        menu = Menu(items)
+        menu = Menu(items, back=True)
         choice = menu.run()
         print()
+        if choice is None:
+            self.selected_payload = None
+            return
         self.selected_payload = payloads[choice]
         print(f"Payload: {os.path.basename(self.selected_payload)}")
 

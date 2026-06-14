@@ -8,10 +8,13 @@ class XORCipher:
         print("\n=== XOR Cipher ===")
         print("[1] XOR Encrypt/Decrypt with key")
         print("[2] Single-byte XOR brute force")
+        print("[0] Back")
 
         choice = input("Select operation: ").strip()
 
-        if choice == '1':
+        if choice == '0':
+            return
+        elif choice == '1':
             self._xor_with_key()
         elif choice == '2':
             self._xor_bruteforce()

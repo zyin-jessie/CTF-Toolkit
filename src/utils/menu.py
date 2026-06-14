@@ -3,8 +3,12 @@ import tty
 import termios
 
 class Menu:
-    def __init__(self, items):
-        self.items = items
+    def __init__(self, items, back=False):
+        self.original_items = list(items)
+        self.back = back
+        self.items = list(items)
+        if back:
+            self.items.append("Back")
         self.selected = 0
         self._rendered = False
 
@@ -26,6 +30,8 @@ class Menu:
         finally:
             self._disable_raw_mode()
 
+        if self.back and self.selected >= len(self.original_items):
+            return None
         return self.selected
 
     def _render(self):

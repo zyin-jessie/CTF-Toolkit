@@ -26,7 +26,8 @@ class PwnStarToolkit:
             "Hash Identifier",
             "Cipher Identifier",
             "Vigenere Decode",
-            "Encoding / Decoding",
+            "Encoding",
+            "Decoding",
             "XOR Cipher",
             "Exit",
         ]
@@ -46,11 +47,14 @@ class PwnStarToolkit:
             elif choice == 3:
                 self.vigenere.decode()
             elif choice == 4:
-                self.encdec.run()
-                self.encdec.display_result()
+                if self.encdec.run(mode="encode"):
+                    self.encdec.display_result()
             elif choice == 5:
-                self.xor.run()
+                if self.encdec.run(mode="decode"):
+                    self.encdec.display_result()
             elif choice == 6:
+                self.xor.run()
+            elif choice == 7:
                 break
 
 if __name__ == "__main__":

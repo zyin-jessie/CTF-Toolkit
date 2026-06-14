@@ -9,54 +9,45 @@ class EncDec:
         self.input_text = ""
         self.output_text = ""
 
-    def run(self):
-        print("\n=== Encoding / Decoding ===")
+    def run(self, mode="encode"):
+        self.input_text = ""
+        self.output_text = ""
 
-        menu_items = [
-            "Base64 Encode",
-            "Base64 Decode",
-            "Base32 Encode",
-            "Base32 Decode",
-            "Hex Encode",
-            "Hex Decode",
-            "URL Encode",
-            "URL Decode",
-            "Binary Encode",
-            "Binary Decode",
-            "ROT13",
-            "ROT47",
-            "Caesar Cipher",
-            "Atbash Cipher",
-            "Reverse String",
-            "Text <-> ASCII Codes",
+        all_ops = [
+            ("Base64", self._base64_encode, "encode"),
+            ("Base64", self._base64_decode, "decode"),
+            ("Base32", self._base32_encode, "encode"),
+            ("Base32", self._base32_decode, "decode"),
+            ("Hex", self._hex_encode, "encode"),
+            ("Hex", self._hex_decode, "decode"),
+            ("URL", self._url_encode, "encode"),
+            ("URL", self._url_decode, "decode"),
+            ("Binary", self._binary_encode, "encode"),
+            ("Binary", self._binary_decode, "decode"),
+            ("ROT13", self._rot13, "both"),
+            ("ROT47", self._rot47, "both"),
+            ("Caesar Cipher", self._caesar, "both"),
+            ("Atbash Cipher", self._atbash, "both"),
+            ("Reverse String", self._reverse, "both"),
+            ("Text <-> ASCII Codes", self._ascii_convert, "both"),
         ]
 
-        menu = Menu(menu_items)
+        title = "Encoding" if mode == "encode" else "Decoding"
+        print(f"\n=== {title} ===")
+
+        filtered = [(name, fn) for name, fn, m in all_ops if m in (mode, "both")]
+        menu_items = [name for name, _ in filtered]
+
+        menu = Menu(menu_items, back=True)
         choice = menu.run()
         print()
 
+        if choice is None:
+            return False
+
         self.input_text = input("Enter text: ")
-
-        operations = [
-            self._base64_encode,
-            self._base64_decode,
-            self._base32_encode,
-            self._base32_decode,
-            self._hex_encode,
-            self._hex_decode,
-            self._url_encode,
-            self._url_decode,
-            self._binary_encode,
-            self._binary_decode,
-            self._rot13,
-            self._rot47,
-            self._caesar,
-            self._atbash,
-            self._reverse,
-            self._ascii_convert,
-        ]
-
-        operations[choice]()
+        filtered[choice][1]()
+        return True
 
     def _base64_encode(self):
         try:
