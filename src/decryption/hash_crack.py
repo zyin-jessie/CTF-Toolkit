@@ -94,6 +94,7 @@ class HashCrack:
         self.verify_func = None
 
     def crack(self):
+        self.found_password = None
         print("\n=== Hash Crack ===")
 
         cat = self._pick_category()
@@ -276,35 +277,35 @@ class HashCrack:
         }
 
     def _select_payload(self, payloads):
-        print("\nAvailable payloads:")
-        for i, p in enumerate(payloads, 1):
-            print(f"[{i}] {os.path.basename(p)}")
-        while True:
+        def count_lines(path):
             try:
-                c = input("\nSelect payload: ").strip()
-                if not c:
-                    self.selected_payload = payloads[0]
-                    break
-                n = int(c)
-                if 1 <= n <= len(payloads):
-                    self.selected_payload = payloads[n - 1]
-                    break
-                print(f"Enter 1-{len(payloads)}")
-            except ValueError:
-                print("Enter a valid number")
+                with open(path, 'r', encoding='latin-1') as f:
+                    return sum(1 for _ in f)
+            except Exception:
+                return 0
+        items = [f"{os.path.basename(p)}  ({count_lines(p):,})" for p in payloads]
+        menu = Menu(items)
+        choice = menu.run()
+        print()
+        self.selected_payload = payloads[choice]
         print(f"Payload: {os.path.basename(self.selected_payload)}")
 
     def _execute_cracking(self):
         print("Cracking... This may take a while.")
         try:
             with open(self.selected_payload, "r", encoding="latin-1") as f:
-                for line in f:
+                for i, line in enumerate(f, 1):
                     pw = line.rstrip("\n\r")
                     if not pw:
                         continue
-                    if self.verify_func(pw, self.target, self.extra):
-                        self.found_password = pw
-                        break
+                    try:
+                        if self.verify_func(pw, self.target, self.extra):
+                            self.found_password = pw
+                            break
+                    except Exception:
+                        continue
+                    if i % 500000 == 0:
+                        print(f"  Processed {i:,} lines...")
         except FileNotFoundError:
             print(f"No available payload: {self.selected_payload}")
         except Exception as e:
