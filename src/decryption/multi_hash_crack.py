@@ -1,4 +1,5 @@
 from utils.payload import Payload
+from utils.menu import Menu
 import hashlib
 import os
 
@@ -18,23 +19,17 @@ class MultiHashCrack:
 
     def crack(self):
         print("\n=== Multi-Algorithm Hash Crack ===")
-        print("[1] MD5")
-        print("[2] SHA-1")
-        print("[3] SHA-256")
+        hash_types = ["MD5", "SHA-1", "SHA-256"]
+        hash_map = ['md5', 'sha1', 'sha256']
         if _NTLM_SUPPORTED:
-            print("[4] NTLM")
-        else:
-            print("[4] NTLM (unsupported in this Python version)")
-
-        choice = input("Select hash type: ").strip()
-        hash_map = {'1': 'md5', '2': 'sha1', '3': 'sha256'}
-        if _NTLM_SUPPORTED:
-            hash_map['4'] = 'ntlm'
-        self.hash_type = hash_map.get(choice)
-
-        if not self.hash_type:
-            print("Invalid hash type.")
+            hash_types.append("NTLM")
+            hash_map.append('ntlm')
+        menu = Menu(hash_types)
+        choice = menu.run()
+        print()
+        if choice is None:
             return
+        self.hash_type = hash_map[choice]
 
         self.target_hash = input("Enter hash: ").strip().lower()
 

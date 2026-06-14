@@ -20,33 +20,43 @@ class EncDec:
             ("Base64", self._base64_decode, "decode"),
             ("Base32", self._base32_encode, "encode"),
             ("Base32", self._base32_decode, "decode"),
+            ("Base85", self._base85_encode, "encode"),
+            ("Base85", self._base85_decode, "decode"),
+            ("Base58", self._base58_encode, "encode"),
+            ("Base58", self._base58_decode, "decode"),
             ("Hex", self._hex_encode, "encode"),
             ("Hex", self._hex_decode, "decode"),
             ("URL", self._url_encode, "encode"),
             ("URL", self._url_decode, "decode"),
             ("Binary", self._binary_encode, "encode"),
             ("Binary", self._binary_decode, "decode"),
+            ("Morse", self._morse_encode, "encode"),
+            ("Morse", self._morse_decode, "decode"),
         ]
 
         cipher_encrypt_ops = [
             ("ROT13", self._rot13),
             ("ROT47", self._rot47),
-            ("Caesar Cipher", self._caesar),
-            ("Atbash Cipher", self._atbash),
-            ("Reverse String", self._reverse),
-            ("Text <-> ASCII Codes", self._ascii_convert),
-            ("XOR Cipher", self._xor_run),
+            ("Caesar", self._caesar),
+            ("Atbash", self._atbash),
+            ("Affine", self._affine),
+            ("Rail Fence", self._rail_fence),
+            ("Reverse", self._reverse),
+            ("ASCII Conv", self._ascii_convert),
+            ("XOR", self._xor_run),
             ("Vigenere", self._vigenere_encrypt),
         ]
 
         cipher_decrypt_ops = [
             ("ROT13", self._rot13),
             ("ROT47", self._rot47),
-            ("Caesar Cipher", self._caesar),
-            ("Atbash Cipher", self._atbash),
-            ("Reverse String", self._reverse),
-            ("Text <-> ASCII Codes", self._ascii_convert),
-            ("XOR Cipher", self._xor_run),
+            ("Caesar", self._caesar),
+            ("Atbash", self._atbash),
+            ("Affine", self._affine_decrypt),
+            ("Rail Fence", self._rail_fence_decrypt),
+            ("Reverse", self._reverse),
+            ("ASCII Conv", self._ascii_convert),
+            ("XOR", self._xor_run),
             ("Vigenere", self._vigenere_decrypt),
         ]
 
@@ -205,17 +215,16 @@ class EncDec:
 
     def _ascii_convert(self):
         try:
-            print("\n[1] Text -> ASCII Codes")
-            print("[2] ASCII Codes -> Text")
-            sub_choice = input("Select direction: ").strip()
+            items = ["Text -> ASCII Codes", "ASCII Codes -> Text"]
+            menu = Menu(items)
+            sub_choice = menu.run()
+            print()
 
-            if sub_choice == '1':
+            if sub_choice == 0:
                 self.output_text = ' '.join(str(ord(c)) for c in self.input_text)
-            elif sub_choice == '2':
+            elif sub_choice == 1:
                 codes = [int(x.strip()) for x in self.input_text.split() if x.strip()]
                 self.output_text = ''.join(chr(c) for c in codes)
-            else:
-                self.output_text = "Invalid option."
         except Exception as e:
             self.output_text = f"Error: {e}"
 
@@ -228,3 +237,199 @@ class EncDec:
             'input': self.input_text,
             'output': self.output_text
         }
+
+    def _base85_encode(self):
+        try:
+            self.output_text = base64.b85encode(self.input_text.encode()).decode()
+        except Exception as e:
+            self.output_text = f"Error: {e}"
+
+    def _base85_decode(self):
+        try:
+            self.output_text = base64.b85decode(self.input_text.encode()).decode()
+        except Exception as e:
+            self.output_text = f"Error: {e}"
+
+    def _base58_encode(self):
+        try:
+            b58 = '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz'
+            num = int.from_bytes(self.input_text.encode(), 'big')
+            res = ''
+            while num > 0:
+                num, rem = divmod(num, 58)
+                res = b58[rem] + res
+            self.output_text = res or '1'
+        except Exception as e:
+            self.output_text = f"Error: {e}"
+
+    def _base58_decode(self):
+        try:
+            b58 = '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz'
+            num = 0
+            for c in self.input_text.strip():
+                num = num * 58 + b58.index(c)
+            byte_len = (num.bit_length() + 7) // 8
+            self.output_text = num.to_bytes(byte_len, 'big').decode()
+        except Exception as e:
+            self.output_text = f"Error: {e}"
+
+    def _morse_encode(self):
+        morse = {
+            'A': '.-', 'B': '-...', 'C': '-.-.', 'D': '-..', 'E': '.',
+            'F': '..-.', 'G': '--.', 'H': '....', 'I': '..', 'J': '.---',
+            'K': '-.-', 'L': '.-..', 'M': '--', 'N': '-.', 'O': '---',
+            'P': '.--.', 'Q': '--.-', 'R': '.-.', 'S': '...', 'T': '-',
+            'U': '..-', 'V': '...-', 'W': '.--', 'X': '-..-', 'Y': '-.--',
+            'Z': '--..', '0': '-----', '1': '.----', '2': '..---', '3': '...--',
+            '4': '....-', '5': '.....', '6': '-....', '7': '--...', '8': '---..',
+            '9': '----.', '.': '.-.-.-', ',': '--..--', '?': '..--..',
+            "'": '.----.', '!': '-.-.--', '/': '-..-.', '(': '-.--.',
+            ')': '-.--.-', '&': '.-...', ':': '---...', ';': '-.-.-.',
+            '=': '-...-', '+': '.-.-.', '-': '-....-', '_': '..--.-',
+            '"': '.-..-.', '$': '...-..-', '@': '.--.-.', ' ': '/',
+        }
+        try:
+            words = []
+            for c in self.input_text.upper():
+                if c in morse:
+                    words.append(morse[c])
+            self.output_text = ' '.join(words)
+        except Exception as e:
+            self.output_text = f"Error: {e}"
+
+    def _morse_decode(self):
+        reverse = {
+            '.-': 'A', '-...': 'B', '-.-.': 'C', '-..': 'D', '.': 'E',
+            '..-.': 'F', '--.': 'G', '....': 'H', '..': 'I', '.---': 'J',
+            '-.-': 'K', '.-..': 'L', '--': 'M', '-.': 'N', '---': 'O',
+            '.--.': 'P', '--.-': 'Q', '.-.': 'R', '...': 'S', '-': 'T',
+            '..-': 'U', '...-': 'V', '.--': 'W', '-..-': 'X', '-.--': 'Y',
+            '--..': 'Z', '-----': '0', '.----': '1', '..---': '2', '...--': '3',
+            '....-': '4', '.....': '5', '-....': '6', '--...': '7', '---..': '8',
+            '----.': '9', '.-.-.-': '.', '--..--': ',', '..--..': '?',
+            '.----.': "'", '-.-.--': '!', '-..-.': '/', '-.--.': '(',
+            '-.--.-': ')', '.-...': '&', '---...': ':', '-.-.-.': ';',
+            '-...-': '=', '.-.-.': '+', '-....-': '-', '..--.-': '_',
+            '.-..-.': '"', '...-..-': '$', '.--.-.': '@',
+        }
+        try:
+            words = []
+            for token in self.input_text.strip().split(' '):
+                if token == '/':
+                    words.append(' ')
+                elif token in reverse:
+                    words.append(reverse[token])
+            self.output_text = ''.join(words)
+        except Exception as e:
+            self.output_text = f"Error: {e}"
+
+    def _affine(self):
+        try:
+            a_s = input("Enter multiplier (a, must be coprime to 26, default 5): ").strip()
+            a = int(a_s) if a_s else 5
+            b_s = input("Enter shift (b, default 8): ").strip()
+            b = int(b_s) if b_s else 8
+
+            import math
+            if math.gcd(a, 26) != 1:
+                self.output_text = "Error: 'a' must be coprime to 26 (e.g., 1, 3, 5, 7, 9, 11, 15, 17, 19, 21, 23, 25)"
+                return
+
+            a_inv = pow(a, -1, 26)
+            result = []
+            for c in self.input_text:
+                if c.isupper():
+                    enc = (a * (ord(c) - ord('A')) + b) % 26
+                    result.append(chr(enc + ord('A')))
+                elif c.islower():
+                    enc = (a * (ord(c) - ord('a')) + b) % 26
+                    result.append(chr(enc + ord('a')))
+                else:
+                    result.append(c)
+            self.output_text = ''.join(result)
+        except Exception as e:
+            self.output_text = f"Error: {e}"
+
+    def _rail_fence(self):
+        try:
+            rails_s = input("Enter number of rails (default 3): ").strip()
+            rails = int(rails_s) if rails_s else 3
+            if rails < 2:
+                self.output_text = "Error: need at least 2 rails"
+                return
+
+            fence = [[] for _ in range(rails)]
+            rail = 0
+            direction = 1
+            for c in self.input_text:
+                fence[rail].append(c)
+                rail += direction
+                if rail == rails - 1 or rail == 0:
+                    direction *= -1
+            self.output_text = ''.join(''.join(r) for r in fence)
+        except Exception as e:
+            self.output_text = f"Error: {e}"
+
+    def _affine_decrypt(self):
+        try:
+            a_s = input("Enter multiplier (a, must be coprime to 26, default 5): ").strip()
+            a = int(a_s) if a_s else 5
+            b_s = input("Enter shift (b, default 8): ").strip()
+            b = int(b_s) if b_s else 8
+
+            import math
+            if math.gcd(a, 26) != 1:
+                self.output_text = "Error: 'a' must be coprime to 26"
+                return
+
+            a_inv = pow(a, -1, 26)
+            result = []
+            for c in self.input_text:
+                if c.isupper():
+                    dec = (a_inv * ((ord(c) - ord('A')) - b)) % 26
+                    result.append(chr(dec + ord('A')))
+                elif c.islower():
+                    dec = (a_inv * ((ord(c) - ord('a')) - b)) % 26
+                    result.append(chr(dec + ord('a')))
+                else:
+                    result.append(c)
+            self.output_text = ''.join(result)
+        except Exception as e:
+            self.output_text = f"Error: {e}"
+
+    def _rail_fence_decrypt(self):
+        try:
+            rails_s = input("Enter number of rails (default 3): ").strip()
+            rails = int(rails_s) if rails_s else 3
+            if rails < 2:
+                self.output_text = "Error: need at least 2 rails"
+                return
+
+            n = len(self.input_text)
+            fence = [[''] * n for _ in range(rails)]
+            rail = 0
+            direction = 1
+            for col in range(n):
+                fence[rail][col] = '*'
+                rail += direction
+                if rail == rails - 1 or rail == 0:
+                    direction *= -1
+
+            idx = 0
+            for r in range(rails):
+                for c in range(n):
+                    if fence[r][c] == '*':
+                        fence[r][c] = self.input_text[idx]
+                        idx += 1
+
+            result = []
+            rail = 0
+            direction = 1
+            for col in range(n):
+                result.append(fence[rail][col])
+                rail += direction
+                if rail == rails - 1 or rail == 0:
+                    direction *= -1
+            self.output_text = ''.join(result)
+        except Exception as e:
+            self.output_text = f"Error: {e}"
