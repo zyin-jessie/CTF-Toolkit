@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
+DIR="$(dirname "$SCRIPT")"
+for py in python3.14 python3 python; do
+    cmd=$(command -v "$py" 2>/dev/null) && break
+done
+if [ -z "$cmd" ]; then
+    echo "Error: Python not found. Install Python 3.14+." >&2
+    exit 1
+fi
+exec "$cmd" "$DIR/src/main.py" "$@"
