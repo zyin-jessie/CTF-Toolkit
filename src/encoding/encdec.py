@@ -3,6 +3,8 @@ import urllib.parse
 import binascii
 import string
 from utils.menu import Menu
+from decryption.vigenere import Vigenere
+from encryption.xor import XORCipher
 
 class EncDec:
     def __init__(self):
@@ -13,7 +15,7 @@ class EncDec:
         self.input_text = ""
         self.output_text = ""
 
-        all_ops = [
+        codec_ops = [
             ("Base64", self._base64_encode, "encode"),
             ("Base64", self._base64_decode, "decode"),
             ("Base32", self._base32_encode, "encode"),
@@ -24,20 +26,46 @@ class EncDec:
             ("URL", self._url_decode, "decode"),
             ("Binary", self._binary_encode, "encode"),
             ("Binary", self._binary_decode, "decode"),
-            ("ROT13", self._rot13, "both"),
-            ("ROT47", self._rot47, "both"),
-            ("Caesar Cipher", self._caesar, "both"),
-            ("Atbash Cipher", self._atbash, "both"),
-            ("Reverse String", self._reverse, "both"),
-            ("Text <-> ASCII Codes", self._ascii_convert, "both"),
         ]
 
-        title = "Encoding" if mode == "encode" else "Decoding"
+        cipher_encrypt_ops = [
+            ("ROT13", self._rot13),
+            ("ROT47", self._rot47),
+            ("Caesar Cipher", self._caesar),
+            ("Atbash Cipher", self._atbash),
+            ("Reverse String", self._reverse),
+            ("Text <-> ASCII Codes", self._ascii_convert),
+            ("XOR Cipher", self._xor_run),
+            ("Vigenere", self._vigenere_encrypt),
+        ]
+
+        cipher_decrypt_ops = [
+            ("ROT13", self._rot13),
+            ("ROT47", self._rot47),
+            ("Caesar Cipher", self._caesar),
+            ("Atbash Cipher", self._atbash),
+            ("Reverse String", self._reverse),
+            ("Text <-> ASCII Codes", self._ascii_convert),
+            ("XOR Cipher", self._xor_run),
+            ("Vigenere", self._vigenere_decrypt),
+        ]
+
+        if mode == "encode":
+            filtered = [(n, fn) for n, fn, _ in codec_ops if _ == "encode"]
+            title = "Encoding"
+        elif mode == "decode":
+            filtered = [(n, fn) for n, fn, _ in codec_ops if _ == "decode"]
+            title = "Decoding"
+        elif mode == "cipher-encrypt":
+            filtered = cipher_encrypt_ops
+            title = "Cipher Encrypt"
+        else:
+            filtered = cipher_decrypt_ops
+            title = "Cipher Decrypt"
+
         print(f"\n=== {title} ===")
 
-        filtered = [(name, fn) for name, fn, m in all_ops if m in (mode, "both")]
         menu_items = [name for name, _ in filtered]
-
         menu = Menu(menu_items, back=True)
         choice = menu.run()
         print()
@@ -45,9 +73,23 @@ class EncDec:
         if choice is None:
             return False
 
+        name, fn = filtered[choice]
+        if name in ("XOR Cipher", "Vigenere"):
+            fn()
+            return False
+
         self.input_text = input("Enter text: ")
-        filtered[choice][1]()
+        fn()
         return True
+
+    def _xor_run(self):
+        XORCipher().run()
+
+    def _vigenere_encrypt(self):
+        Vigenere().encode()
+
+    def _vigenere_decrypt(self):
+        Vigenere().decode()
 
     def _base64_encode(self):
         try:

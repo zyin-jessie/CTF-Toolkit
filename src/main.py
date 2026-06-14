@@ -4,9 +4,7 @@ from utils.menu import Menu
 from decryption.hash_crack import HashCrack
 from decryption.hash_identifier import HashIdentifier
 from decryption.cipher_identifier import CipherIdentifier
-from decryption.vigenere import Vigenere
 from encoding.encdec import EncDec
-from encryption.xor import XORCipher
 
 class PwnStarToolkit:
     def __init__(self):
@@ -14,9 +12,7 @@ class PwnStarToolkit:
         self.hash = HashCrack()
         self.hash_id = HashIdentifier()
         self.cipher_id = CipherIdentifier()
-        self.vigenere = Vigenere()
         self.encdec = EncDec()
-        self.xor = XORCipher()
 
         self.run()
 
@@ -25,10 +21,10 @@ class PwnStarToolkit:
             "Hash Crack",
             "Hash Identifier",
             "Cipher Identifier",
-            "Vigenere Decode",
             "Encoding",
             "Decoding",
-            "XOR Cipher",
+            "Cipher Encrypt",
+            "Cipher Decrypt",
             "Exit",
         ]
 
@@ -45,15 +41,17 @@ class PwnStarToolkit:
             elif choice == 2:
                 self.cipher_id.run()
             elif choice == 3:
-                self.vigenere.decode()
-            elif choice == 4:
                 if self.encdec.run(mode="encode"):
                     self.encdec.display_result()
-            elif choice == 5:
+            elif choice == 4:
                 if self.encdec.run(mode="decode"):
                     self.encdec.display_result()
+            elif choice == 5:
+                if self.encdec.run(mode="cipher-encrypt"):
+                    self.encdec.display_result()
             elif choice == 6:
-                self.xor.run()
+                if self.encdec.run(mode="cipher-decrypt"):
+                    self.encdec.display_result()
             elif choice == 7:
                 break
 
