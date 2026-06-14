@@ -1,4 +1,5 @@
 /public/payload/
+/graphify-out
 .idea/
 **/__init__.py
 *.pyc
