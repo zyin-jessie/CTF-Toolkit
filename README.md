@@ -88,7 +88,7 @@ cd C:\
 
 **Step 3: Clone the Repository**
 ```cmd
-git clone https://github.com/zyin-jessie/PwnStar-Toolkit.git
+git clone https://github.com/zyin-jessie/CTF-Toolkit.git
 ```
 
 **Step 4: Add to System PATH**
@@ -98,7 +98,7 @@ git clone https://github.com/zyin-jessie/PwnStar-Toolkit.git
 - Under "User variables", select "Path" and click "Edit"
 - Click "New" and add the following path:
 ```cmd
-C:\PwnStar-Toolkit
+C:\CTF-Toolkit
 ```
 
 **Step 5: Launch the Toolkit**
