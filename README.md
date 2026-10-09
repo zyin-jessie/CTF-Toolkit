@@ -25,16 +25,19 @@
   HMAC / PBKDF2 variants, Windows (NTLM, NetNTLMv2, MSCHAPv2),
   Database (MySQL, MSSQL, PostgreSQL, Oracle), Django, PHPS2, and more.
 - Vigenere cipher decoding.
-- Encoding / Decoding tools: Base64, Base32, Hex, URL, Binary,
-  ROT13, ROT47, Caesar, Atbash, Reverse, ASCII converter.
+- Encoding / Decoding tools: Base64, Base32, Base58, Base85, Hex, URL,
+  Binary, Morse, Bacon, A1Z26, ROT13, ROT47, Caesar, Atbash, Affine,
+  Beaufort, Rail Fence, Reverse, ASCII converter.
+- Caesar / ROT brute-force (shows all 26 shifts at once).
+- Frequency analysis with letter histogram, Index of Coincidence,
+  and chi-squared Caesar-shift suggestions.
 - XOR cipher with key-based encryption and single-byte brute-force.
 - Arrow-key navigated TUI menu with green selection indicator.
 - Modular class-based architecture for easy extension.
 
 ## Upcoming Features
 
-- More classical ciphers (Affine, Beaufort, etc.).
-- Frequency analysis and pattern detection.
+- More classical ciphers (Playfair, Hill, etc.).
 - Workspace mode for saving outputs.
 - Modular plugin system for community extensions.
 

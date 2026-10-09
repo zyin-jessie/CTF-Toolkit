@@ -5,6 +5,7 @@ from decryption.hash_crack import HashCrack
 from decryption.hash_identifier import HashIdentifier
 from decryption.multi_hash_crack import MultiHashCrack
 from decryption.cipher_identifier import CipherIdentifier
+from decryption.freq_analysis import FreqAnalysis
 from encoding.encdec import EncDec
 from steganography.lsb import LSBSteg
 from steganography.exif import ExifViewer
@@ -22,6 +23,7 @@ class PwnStarToolkit:
         self.hash_id = HashIdentifier()
         self.multi_hash = MultiHashCrack()
         self.cipher_id = CipherIdentifier()
+        self.freq = FreqAnalysis()
         self.encdec = EncDec()
         self.lsb = LSBSteg()
         self.exif = ExifViewer()
@@ -87,6 +89,7 @@ class PwnStarToolkit:
     def _cipher_tools_menu(self):
         items = [
             "Cipher Identifier",
+            "Frequency Analysis",
             "Encoding",
             "Decoding",
             "Cipher Encrypt",
@@ -103,15 +106,17 @@ class PwnStarToolkit:
             elif choice == 0:
                 self.cipher_id.run()
             elif choice == 1:
+                self.freq.run()
+            elif choice == 2:
                 if self.encdec.run(mode="encode"):
                     self.encdec.display_result()
-            elif choice == 2:
+            elif choice == 3:
                 if self.encdec.run(mode="decode"):
                     self.encdec.display_result()
-            elif choice == 3:
+            elif choice == 4:
                 if self.encdec.run(mode="cipher-encrypt"):
                     self.encdec.display_result()
-            elif choice == 4:
+            elif choice == 5:
                 if self.encdec.run(mode="cipher-decrypt"):
                     self.encdec.display_result()
 

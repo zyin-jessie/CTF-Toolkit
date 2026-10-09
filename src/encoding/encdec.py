@@ -32,6 +32,10 @@ class EncDec:
             ("Binary", self._binary_decode, "decode"),
             ("Morse", self._morse_encode, "encode"),
             ("Morse", self._morse_decode, "decode"),
+            ("Bacon", self._bacon_encode, "encode"),
+            ("Bacon", self._bacon_decode, "decode"),
+            ("A1Z26", self._a1z26_encode, "encode"),
+            ("A1Z26", self._a1z26_decode, "decode"),
         ]
 
         cipher_encrypt_ops = [
@@ -40,6 +44,7 @@ class EncDec:
             ("Caesar", self._caesar),
             ("Atbash", self._atbash),
             ("Affine", self._affine),
+            ("Beaufort", self._beaufort),
             ("Rail Fence", self._rail_fence),
             ("Reverse", self._reverse),
             ("ASCII Conv", self._ascii_convert),
@@ -53,6 +58,8 @@ class EncDec:
             ("Caesar", self._caesar),
             ("Atbash", self._atbash),
             ("Affine", self._affine_decrypt),
+            ("Beaufort", self._beaufort),
+            ("Caesar Brute", self._caesar_brute),
             ("Rail Fence", self._rail_fence_decrypt),
             ("Reverse", self._reverse),
             ("ASCII Conv", self._ascii_convert),
@@ -394,6 +401,93 @@ class EncDec:
                 else:
                     result.append(c)
             self.output_text = ''.join(result)
+        except Exception as e:
+            self.output_text = f"Error: {e}"
+
+    def _caesar_brute(self):
+        try:
+            lines = []
+            for shift in range(26):
+                out = []
+                for c in self.input_text:
+                    if c.isupper():
+                        out.append(chr((ord(c) - ord('A') + shift) % 26 + ord('A')))
+                    elif c.islower():
+                        out.append(chr((ord(c) - ord('a') + shift) % 26 + ord('a')))
+                    else:
+                        out.append(c)
+                lines.append(f"[shift {shift:2d}] {''.join(out)}")
+            self.output_text = "\n" + "\n".join(lines)
+        except Exception as e:
+            self.output_text = f"Error: {e}"
+
+    def _beaufort(self):
+        try:
+            key = input("Enter key: ").strip()
+            key_letters = [k for k in key.lower() if k.isalpha()]
+            if not key_letters:
+                self.output_text = "Error: key must contain letters"
+                return
+
+            result = []
+            ki = 0
+            for c in self.input_text:
+                if c.isalpha():
+                    base = ord('A') if c.isupper() else ord('a')
+                    k = ord(key_letters[ki % len(key_letters)]) - ord('a')
+                    # Beaufort is self-reciprocal: (key - plain) mod 26
+                    val = (k - (ord(c) - base)) % 26
+                    result.append(chr(val + base))
+                    ki += 1
+                else:
+                    result.append(c)
+            self.output_text = ''.join(result)
+        except Exception as e:
+            self.output_text = f"Error: {e}"
+
+    def _bacon_encode(self):
+        try:
+            bacon = {chr(ord('A') + i): format(i, '05b').replace('0', 'A').replace('1', 'B')
+                     for i in range(26)}
+            out = []
+            for c in self.input_text.upper():
+                if c in bacon:
+                    out.append(bacon[c])
+            self.output_text = ' '.join(out)
+        except Exception as e:
+            self.output_text = f"Error: {e}"
+
+    def _bacon_decode(self):
+        try:
+            reverse = {format(i, '05b').replace('0', 'A').replace('1', 'B'): chr(ord('A') + i)
+                       for i in range(26)}
+            cleaned = ''.join(c for c in self.input_text.upper() if c in 'AB')
+            groups = [cleaned[i:i + 5] for i in range(0, len(cleaned), 5)]
+            self.output_text = ''.join(reverse.get(g, '?') for g in groups if len(g) == 5)
+        except Exception as e:
+            self.output_text = f"Error: {e}"
+
+    def _a1z26_encode(self):
+        try:
+            out = []
+            for c in self.input_text.lower():
+                if c.isalpha():
+                    out.append(str(ord(c) - ord('a') + 1))
+                elif c == ' ':
+                    out.append('/')
+            self.output_text = ' '.join(out)
+        except Exception as e:
+            self.output_text = f"Error: {e}"
+
+    def _a1z26_decode(self):
+        try:
+            out = []
+            for token in self.input_text.replace('/', ' / ').split():
+                if token == '/':
+                    out.append(' ')
+                elif token.isdigit() and 1 <= int(token) <= 26:
+                    out.append(chr(int(token) - 1 + ord('a')))
+            self.output_text = ''.join(out)
         except Exception as e:
             self.output_text = f"Error: {e}"
 
