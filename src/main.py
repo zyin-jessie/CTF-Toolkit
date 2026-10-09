@@ -12,6 +12,7 @@ from steganography.exif import ExifViewer
 from forensics.file_analyzer import FileAnalyzer
 from forensics.hex_dump import HexDump
 from forensics.strings import Strings
+from web.web_recon import WebRecon
 from misc.password_gen import PasswordGen
 from misc.jwt_decode import JWTDecode
 from misc.converter import Converter
@@ -30,6 +31,7 @@ class PwnStarToolkit:
         self.file_analyzer = FileAnalyzer()
         self.hex_dump = HexDump()
         self.strings = Strings()
+        self.web_recon = WebRecon()
         self.password_gen = PasswordGen()
         self.jwt_decode = JWTDecode()
         self.converter = Converter()
@@ -42,6 +44,7 @@ class PwnStarToolkit:
             "Cipher Tools",
             "Steganography",
             "Forensics",
+            "Web Recon",
             "Misc Tools",
             "Exit",
         ]
@@ -61,8 +64,10 @@ class PwnStarToolkit:
             elif choice == 3:
                 self._forensics_menu()
             elif choice == 4:
-                self._misc_menu()
+                self.web_recon.run()
             elif choice == 5:
+                self._misc_menu()
+            elif choice == 6:
                 break
 
     def _hash_tool_menu(self):

@@ -28,6 +28,9 @@
 - Encoding / Decoding tools: Base64, Base32, Base58, Base85, Hex, URL,
   Binary, Morse, Bacon, A1Z26, ROT13, ROT47, Caesar, Atbash, Affine,
   Beaufort, Rail Fence, Reverse, ASCII converter.
+- Web recon: HTTP header inspection, directory/file discovery
+  (built-in or custom wordlist), robots.txt / sitemap.xml fetch,
+  and an HTML comment / link / form extractor with flag detection.
 - Caesar / ROT brute-force (shows all 26 shifts at once).
 - Frequency analysis with letter histogram, Index of Coincidence,
   and chi-squared Caesar-shift suggestions.
