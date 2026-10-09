@@ -64,9 +64,16 @@ chmod +x pwnstar
 ```
 
 **Step 4: Add to PATH (optional — lets you run `pwnstar` from anywhere)**
+
+This auto-detects your shell and updates the right startup file (`~/.zshrc`
+for zsh, `~/.bashrc` for bash):
 ```bash
-echo 'export PATH="$PATH:'"$(pwd)"'"' >> ~/.bashrc
-source ~/.bashrc
+case "$(basename "${SHELL:-}")" in
+    zsh)  RC="$HOME/.zshrc" ;;
+    *)    RC="$HOME/.bashrc" ;;
+esac
+echo 'export PATH="$PATH:'"$(pwd)"'"' >> "$RC"
+source "$RC"
 ```
 
 **Step 5: Launch the Toolkit**
